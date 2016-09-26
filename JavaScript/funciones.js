@@ -6,27 +6,56 @@ $(document).ready(function(){
 
 function MostrarGrilla(){
 	
-    var pagina = "./administracion.php";
-
-	$.ajax({
-        type: 'POST',
-        url: pagina,
+    $.ajax({
+    	url:"./administracion.php",
+    	type: 'POST',
 		data : { queHago : "mostrarGrilla"},
         dataType: "html",
         async: true
-    })
-	.done(function (grilla) {
-
-		$("#divGrilla").html(grilla);
-	})
-	.fail(function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
-    });   
+    }).then(function exito(grilla){
+    	$("#divGrilla").html(grilla);
+    },function error(jqXHR, textStatus, errorThrown){
+    	alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
+    }); 
 }
 
 function SubirFoto(){
 	
-    var pagina = "./administracion.php";
+	var foto = $("#archivo").val();
+	if(foto === "")
+	{
+		return;
+	}
+	var archivo = $("#archivo")[0];
+	var formData = new FormData();
+	formData.append("archivo",archivo.files[0]);
+	formData.append("queHago", "subirFoto");
+	alert(formData);
+
+	$.ajax({
+		type: 'POST',
+        url: "./administracion.php",
+        dataType: "json",
+		cache: false,
+		contentType: false,
+		processData: false,
+        data: formData,
+        async: true
+	}).then(function exito(objJson){
+		if(!objJson.Exito){
+			alert(objJson.Mensaje);
+			return;
+		}
+		$("#divFoto").html(objJson.Html);
+	},function error(jqXHR, textStatus, errorThrown){
+		alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
+	});
+
+
+
+
+
+    /*var pagina = "./administracion.php";
 	var foto = $("#archivo").val();
 	
 	if(foto === "")
@@ -59,7 +88,7 @@ function SubirFoto(){
 	})
 	.fail(function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
-    });   
+    });   */
 }
 
 function BorrarFoto(){
